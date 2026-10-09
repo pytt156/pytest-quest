@@ -7,7 +7,39 @@ Write your tests in this file (you may add more test_*.py files too).
     Done? Commit it:     git add tests/level_01  then  git commit
 """
 
-from dungeon.hero import Hero
+from dungeon.hero import Hero, HeroIsDeadError
+import pytest
+
+
+class TestNewHero:
+    test_hero = Hero("pytt")
+
+    def test_new_hero_is_alive(self):
+        assert self.test_hero.is_alive == True
+
+    def test_heal_never_goes_above_100(self):
+        self.test_hero.heal(200)
+        assert self.test_hero.hp == 100
+
+    def test_gain_level_at_100_xp(self):
+        self.test_hero.gain_xp(500)
+        assert self.test_hero.level == 6
+
+    def test_negative_xp_gives_value_error(self):
+        with pytest.raises(ValueError):
+            self.test_hero.gain_xp(-10)
+
+    def test_hp_never_goes_below_0(self):
+        self.test_hero.take_damage(250)
+        assert self.test_hero.hp == 0
+
+    def test_cannot_heal_dead(self):
+        with pytest.raises(HeroIsDeadError):
+            self.test_hero.heal(20)
+
+    def test_shout(self):
+        result = self.test_hero.shout()
+        assert result == "PYTT CHARGES!"
 
 
 # A first step, to get you going. Uncomment it, run it, then make it your own:
