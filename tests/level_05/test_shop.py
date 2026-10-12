@@ -10,6 +10,41 @@ Write your tests in this file (you may add more test_*.py files too).
 import pytest
 
 from dungeon.shop import Listing, NotEnoughGoldError, OutOfStockError, Shop
+from dungeon.inventory import InventoryFullError
+
+
+def test_buying_updates_inventory_gold_and_stock(hero, backpack, shop):
+    hero.gold = 10
+    shop.buy(hero, backpack, "apple")
+    assert hero.gold == 5
+    assert "apple" in backpack
+    assert shop.stock_of("apple") == 9
+
+
+def test_shop_listings(shop):
+    assert "apple" in shop._listings
+
+
+def test_too_little_gold(hero, backpack, shop):
+    with pytest.raises(NotEnoughGoldError):
+        shop.buy(hero, backpack, "awesome armor")
+
+
+def test_out_of_stock(rich_hero, backpack, shop):
+    with pytest.raises(OutOfStockError):
+        shop.buy(rich_hero, backpack, "cooluru sworduru")
+
+
+def test_backpack_full(rich_hero, backpack, shop):
+    with pytest.raises(InventoryFullError):
+        shop.buy(rich_hero, backpack, "awesome armor")
+    assert rich_hero.gold == 440
+
+
+def test_selling_refills_stock(rich_hero, backpack, shop):
+    shop.sell(rich_hero, backpack, "cooluru ringuru")
+    assert shop.stock_of("cooluru ringuru") == 1
+    assert rich_hero.gold == 460
 
 
 # A first step, to get you going. Uncomment it, run it, then make it your own:
