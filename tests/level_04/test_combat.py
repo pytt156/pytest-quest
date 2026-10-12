@@ -12,6 +12,46 @@ import pytest
 from dungeon.combat import calculate_damage
 
 
+@pytest.mark.parametrize(
+    ("attack", "defense", "critical", "element", "weakness", "expected"),
+    [
+        (10, 5, False, "fire", "ice", 5),
+        (10, 5, True, "fire", "ice", 10),
+        (10, 5, False, "fire", "fire", 7),
+        (10, 5, True, "fire", "fire", 15),
+        (10, 5, False, None, None, 5),
+        (0, 0, False, "fire", "ice", 1),
+        (1, 10, False, "fire", "ice", 1),
+    ],
+    ids=[
+        "normal attack",
+        "critical attack",
+        "elemental weakness",
+        "critical elemental",
+        "no elemental",
+        "zero attack, zero defense = one damage",
+        "one attack, high defense = one damage",
+    ],
+)
+def test_damage(attack, defense, critical, element, weakness, expected):
+    assert (
+        calculate_damage(
+            attack, defense, critical=critical, element=element, weakness=weakness
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    ("attack", "defense"),
+    [(-1, 10), (0, -2)],
+    ids=["negative attack", "negative defense"],
+)
+def test_damage_value_error(attack, defense):
+    with pytest.raises(ValueError):
+        calculate_damage(attack, defense)
+
+
 # A first step, to get you going. Uncomment it, run it, then make it your own:
 #
 # @pytest.mark.parametrize(
