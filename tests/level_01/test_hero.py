@@ -12,34 +12,37 @@ import pytest
 
 
 class TestNewHero:
-    test_hero = Hero("pytt")
+    @pytest.fixture
+    def hero(self):
+        return Hero("pytt")
 
-    def test_new_hero_is_alive(self):
-        assert self.test_hero.is_alive == True
+    def test_new_hero_is_alive(self, hero):
+        assert hero.is_alive
 
-    def test_heal_never_goes_above_100(self):
-        self.test_hero.heal(200)
-        assert self.test_hero.hp == 100
+    def test_heal_never_goes_above_100(self, hero):
+        hero.heal(200)
+        assert hero.hp == 100
 
-    def test_gain_level_at_100_xp(self):
-        self.test_hero.gain_xp(500)
-        assert self.test_hero.level == 6
+    def test_gain_level_at_100_xp(self, hero):
+        hero.gain_xp(500)
+        assert hero.level == 6
 
-    def test_negative_xp_gives_value_error(self):
+    def test_negative_xp_gives_value_error(self, hero):
         with pytest.raises(ValueError):
-            self.test_hero.gain_xp(-10)
+            hero.gain_xp(-10)
 
-    def test_hp_never_goes_below_0(self):
-        self.test_hero.take_damage(250)
-        assert self.test_hero.hp == 0
+    def test_hp_never_goes_below_0(self, hero):
+        hero.take_damage(250)
+        assert hero.hp == 0
 
-    def test_cannot_heal_dead(self):
+    def test_cannot_heal_dead(self, hero):
+        hero.take_damage(250)
+
         with pytest.raises(HeroIsDeadError):
-            self.test_hero.heal(20)
+            hero.heal(20)
 
-    def test_shout(self):
-        result = self.test_hero.shout()
-        assert result == "PYTT CHARGES!"
+    def test_shout(self, hero):
+        assert hero.shout() == "PYTT CHARGES!"
 
 
 # A first step, to get you going. Uncomment it, run it, then make it your own:
